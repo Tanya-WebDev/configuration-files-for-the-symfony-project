@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./:/app
+
+  php:
+    build: ./
+    environment:
+      PHP_IDE_CONFIG: "serverName=***"
+    volumes:
+      - ./:/app
+      - ./xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+  db:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "***"
+      POSTGRES_USER: "tanya"
+      POSTGRES_PASSWORD: "123"
+    ports:
+      - "5432:5432"
+
+  rabbitmq3:
+    container_name: "rabbitmq"
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - '5672:5672'
+      - '15672:15672'
