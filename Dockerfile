@@ -1,6 +1,6 @@
 FROM php:8.1.0-fpm-alpine AS ext-amqp
 
-ENV EXT_AMQP_VERSION=master
+ENV EXT_AMQP_VERSION=latest
 
 RUN docker-php-source extract \
     && apk -Uu add git rabbitmq-c-dev \
@@ -30,6 +30,8 @@ RUN set -ex \
        # && docker-php-ext-enable redis.so
 
 RUN docker-php-ext-install pdo pdo_pgsql
+
+RUN apk add --update linux-headers
 
 RUN apk --update --no-cache add autoconf g++ make && \
     pecl install -f xdebug && \
