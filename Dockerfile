@@ -1,4 +1,4 @@
-FROM php:8.1.0-fpm-alpine AS ext-amqp
+FROM php:8.2-fpm-alpine3.18 AS ext-amqp
 
 ENV EXT_AMQP_VERSION=latest
 
@@ -10,10 +10,10 @@ RUN docker-php-source extract \
 
 RUN ls -al /usr/local/lib/php/extensions/
 
-FROM php:8.1.0-fpm-alpine
+FROM php:8.2-fpm-alpine3.18
 
 COPY --from=ext-amqp /usr/local/etc/php/conf.d/docker-php-ext-amqp.ini /usr/local/etc/php/conf.d/docker-php-ext-amqp.ini
-COPY --from=ext-amqp /usr/local/lib/php/extensions/no-debug-non-zts-20210902/amqp.so /usr/local/lib/php/extensions/no-debug-non-zts-20210902/amqp.so
+COPY --from=ext-amqp /usr/local/lib/php/extensions/no-debug-non-zts-20220829/amqp.so /usr/local/lib/php/extensions/no-debug-non-zts-20220829/amqp.so
 
 RUN set -ex \
   && apk --no-cache add \
@@ -33,10 +33,13 @@ RUN docker-php-ext-install pdo pdo_pgsql
 
 RUN apk add --update linux-headers
 
+RUN apk update && apk upgrade
+
 RUN apk --update --no-cache add autoconf g++ make && \
-    pecl install -f xdebug && \
+    pecl install -f xdebug-3.3.1 && \
     docker-php-ext-enable xdebug && \
-    apk del --purge autoconf g++ make
+    apk del --purge autoconf g++ make && \
+    ls -al /usr/local/lib/php/extensions/
 
 RUN apk --update --no-cache add autoconf g++ make && \
      pecl install -f pcov && \
